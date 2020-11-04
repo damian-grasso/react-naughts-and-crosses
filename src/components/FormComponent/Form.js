@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
+import "./Form.css";
 
-class Form extends Component {
+class Form extends React.Component {
   constructor() {
     super();
 
@@ -29,12 +30,10 @@ class Form extends Component {
           value={this.state.value}
           onChange={this.handleChange}
         />
+        <p>{this.state.value}</p>
       </form>
     );
   }
 }
 
 export default Form;
-
-const wrapper = document.getElementById("container");
-wrapper ? ReactDOM.render(<Form />, wrapper) : false;
