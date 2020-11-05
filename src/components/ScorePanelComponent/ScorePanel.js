@@ -15,7 +15,7 @@ class ScorePanel extends React.Component {
       <div>
         <Score player={ PlayerState.NAUGHTS_PLAYER } />
         <Score player={ PlayerState.CROSSES_PLAYER } />
-        <p>{ this.props.outcome }</p>
+        <p>{ this.props.gameState }</p>
       </div>
     );
   }

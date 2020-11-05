@@ -11,9 +11,9 @@ class Score extends React.Component {
 
   render() {
     return (
-      <div>
+      <span>
         <p>{this.props.player}</p>
-      </div>
+      </span>
     );
   }
 }
