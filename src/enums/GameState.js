@@ -1,0 +1,2 @@
+const GameState = { NAUGHTS_WINS: "Naughts Wins!", CROSSES_WINS: "Crosses Wins!", DRAW: "Draw!", UNDECIDED: "Game In Progress...", NAUGHTS_TURN: "Naughts Turn", NAUGHTS_TURN_COMPLETED: "Naughts Turn Completed", CROSSES_TURN: "Crosses Turn", CROSSES_TURN_COMPLETED: "Crosses Turn Completed" }
+export default GameState;
