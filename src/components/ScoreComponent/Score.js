@@ -12,7 +12,7 @@ class Score extends React.Component {
   render() {
     return (
       <span>
-        <h4 class="gameText">{this.props.player}</h4>
+        <h4 className="gameText">{this.props.player}</h4>
       </span>
     );
   }

@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import ReactDOM from "react-dom";
 import GameBoard from "./components/GameBoardComponent/GameBoard";
 import ScorePanel from "./components/ScorePanelComponent/ScorePanel";
@@ -23,14 +23,14 @@ class App extends React.Component {
           { x: 2, y: 0, value: SquareState.BLANK },
           { x: 2, y: 1, value: SquareState.BLANK },
           { x: 2, y: 2, value: SquareState.BLANK }
-      ],
-      boardHistory: []
+      ]
     };
 
-    this.changeState = this.changeState.bind(this)
-    this.updateBoardState = this.updateBoardState.bind(this)
-    this.resetBoardState = this.resetBoardState.bind(this)
-    this.checkForWinner = this.checkForWinner.bind(this)
+    this.changeState = this.changeState.bind(this);
+    this.updateBoardState = this.updateBoardState.bind(this);
+    this.resetBoardState = this.resetBoardState.bind(this);
+    this.checkForWinner = this.checkForWinner.bind(this);
+    this.goBackOneTurn = this.goBackOneTurn.bind(this);
   }
 
   updateBoardState(boardState, xCoord, yCoord, newSquareState) {
@@ -52,17 +52,9 @@ class App extends React.Component {
       return square;
     });
 
-    this.setState(state => {
-      const boardHistory = state.boardHistory.concat([updatedBoardState]);
- 
-      return {
-        boardState: updatedBoardState,
-        boardHistory: boardHistory
-      };
-    });
+    this.setState({ boardState: updatedBoardState });
 
     console.log("Updated board state ", updatedBoardState);
-    console.log("Board history", this.state.boardHistory);
 
     return updatedBoardState;
   }
@@ -212,6 +204,7 @@ class App extends React.Component {
         <button type="button" onClick={() => {
           this.changeState(GameEvent.RESET, -1, -1, SquareState.BLANK);
         }}>Reset</button>
+<br/>
       </div>
     );
   }
