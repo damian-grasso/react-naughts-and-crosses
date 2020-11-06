@@ -6,6 +6,7 @@ import GameEvent from "./enums/GameEvent";
 import SquareState from "./enums/SquareState";
 import GameState from "./enums/GameState";
 import "./index.css";
+import PlayerState from "./enums/PlayerState";
 
 class App extends React.Component {
   constructor() {
@@ -13,7 +14,6 @@ class App extends React.Component {
 
     this.state = {
       gameState: GameState.NAUGHTS_TURN,
-      freeSquares: 9,
       boardState: [
           { x: 0, y: 0, value: SquareState.BLANK },
           { x: 0, y: 1, value: SquareState.BLANK },
@@ -24,12 +24,12 @@ class App extends React.Component {
           { x: 2, y: 0, value: SquareState.BLANK },
           { x: 2, y: 1, value: SquareState.BLANK },
           { x: 2, y: 2, value: SquareState.BLANK }
-      ],
-      winner: false
+      ]
     };
 
     this.changeState = this.changeState.bind(this)
     this.updateBoardState = this.updateBoardState.bind(this)
+    this.resetBoardState = this.resetBoardState.bind(this)
     this.checkForWinner = this.checkForWinner.bind(this)
   }
 
@@ -37,22 +37,90 @@ class App extends React.Component {
 
     var _ = require('underscore');
 
+    console.log("The Square clicked: ", xCoord, ", ", yCoord);
+
     var updatedBoardState = _.map(boardState, function(square) {
+
+      console.log("Square to evaluate: ", square.x, ", ", square.y);
+    
       if (square.x == xCoord && square.y == yCoord) {
+        console.log("Square adjusted before ", square);
         square.value = newSquareState;
+        console.log("Square adjusted after ", square);
       }
 
       return square;
     });
 
-    console.log("Updated board state", updatedBoardState);
+    this.setState({ 
+      boardState: updatedBoardState 
+    });
 
-    this.setState({ boardState: updatedBoardState });
+    console.log("Updated board state ", updatedBoardState);
+
+    return updatedBoardState;
   }
 
-  checkForWinner(boardState, newSquareState) {
+  resetBoardState(boardState) {
 
     var _ = require('underscore');
+
+    var updatedBoardState = _.map(boardState, function(square) {
+      square.value = SquareState.BLANK;
+      return square;
+    });
+    
+    this.setState({
+      boardState: updatedBoardState
+    });
+
+    return updatedBoardState;
+  }
+
+  updateGameState(gameState, boardState, event) {
+
+    var newGameState = null;   
+    
+    switch (event) {
+      case GameEvent.TURN_COMPLETED: 
+        var winner = this.checkForWinner(boardState);
+
+        if (gameState == GameState.NAUGHTS_TURN) {
+          if (!winner) { 
+            newGameState = GameState.CROSSES_TURN; 
+          }
+    
+          else { 
+            newGameState = GameState.NAUGHTS_WINS; 
+          }
+        }
+    
+        else if (gameState == GameState.CROSSES_TURN) {
+          if (!winner) { 
+            newGameState = GameState.NAUGHTS_TURN; 
+          }
+    
+          else { 
+            newGameState = GameState.CROSSES_WINS; 
+          }
+        }
+
+        break;
+      
+      case GameEvent.RESET:
+        newGameState = GameState.NAUGHTS_TURN;
+    }
+
+    this.setState({ gameState: newGameState });
+
+    return newGameState;
+  }
+
+  checkForWinner(boardState) {
+
+    var _ = require('underscore');
+
+    console.log("Board state ", boardState, " ", boardState[0]);
 
     var waysToWin = [
 
@@ -71,56 +139,66 @@ class App extends React.Component {
       [boardState[0], boardState[4], boardState[8]]
     ];
 
+    console.log("Ways to win ", waysToWin);
+
     var winner = _.find(waysToWin, function(wayToWin) {
       
-      if (wayToWin[0].value == newSquareState && 
-          wayToWin[1].value == newSquareState && 
-          wayToWin[2].value == newSquareState) {
-            
-          console.log(wayToWin[0].value, wayToWin[1].value, wayToWin[2].value);
+      console.log(wayToWin[0].value == SquareState.NAUGHT && wayToWin[1].value == SquareState.NAUGHT && 
+        wayToWin[2].value == SquareState.NAUGHT);
+
+      if (wayToWin[0].value == SquareState.NAUGHT && wayToWin[1].value == SquareState.NAUGHT && 
+          wayToWin[2].value == SquareState.NAUGHT) {
 
           return true;
-        }
+      }
+
+      if (wayToWin[0].value == SquareState.CROSS && wayToWin[1].value == SquareState.CROSS && 
+          wayToWin[2].value == SquareState.CROSS) {
+
+            return true;
+          }
     });
 
+    console.log(winner);
+
     if (winner == undefined) {
-      return false;
+      winner = false;
     }
 
-    return true;
+    return winner;
   }
 
   changeState(event, xCoord, yCoord, newSquareState) {
 
+    console.log("State change invoked");
 
+    console.log("Most recent game event is ", event);
+    console.log("Most recent game state is ", this.state.gameState)
 
-    console.log("Square was clicked during game");
+    if ((this.state.gameState != GameState.NAUGHTS_WINS || this.state.gameState != GameState.CROSSES_WINS) &&
+        newSquareState != null) {
 
-    if (this.state.gameState != GameState.NAUGHTS_WINS || this.state.gameState != GameState.CROSSES_WINS) {
+      switch(event) {
+        case GameEvent.TURN_COMPLETED: 
 
-      this.updateBoardState(this.state.boardState, xCoord, yCoord, newSquareState);
+          console.log("A square was clicked");
 
-      var newGameState = null;
-      var winner = this.checkForWinner(this.state.boardState, newSquareState);
+          var newBoardState = this.updateBoardState(this.state.boardState, xCoord, yCoord, newSquareState);  
+          this.updateGameState(this.state.gameState, newBoardState, GameEvent.TURN_COMPLETED);
+          
+          break;
+        
+        case GameEvent.RESET: 
 
-      console.log("Most recent game event is ", event);
-      console.log("Most recent game state is ", this.state.gameState)
-      console.log("Winner value is ", winner);
+          console.log("The reset button was clicked");
 
-      if (event == GameEvent.TURN_COMPLETED && this.state.gameState == GameState.NAUGHTS_TURN) {
-        if (!winner) { newGameState = GameState.CROSSES_TURN; }
-        else { newGameState = GameState.NAUGHTS_WINS; }
+          var newBoardState = this.resetBoardState(this.state.boardState);
+          this.updateGameState(this.state.gameState, newBoardState, GameEvent.RESET);
+
+          break;
+
+        }
       }
-
-      else if (event == GameEvent.TURN_COMPLETED && this.state.gameState == GameState.CROSSES_TURN) {
-        if (!winner) { newGameState = GameState.NAUGHTS_TURN; }
-        else { newGameState = GameState.CROSSES_WINS; }
-      }
-
-      this.setState({ gameState: newGameState });
-    }
-
-    console.log("Game state is now", newGameState)
   }
 
   render() {
@@ -128,6 +206,9 @@ class App extends React.Component {
       <div>
         <GameBoard outcome={this.state.outcome} changeState={this.changeState} gameState={this.state.gameState} boardState={this.state.boardState}/>
         <ScorePanel outcome={this.state.outcome} changeState={this.changeState} gameState={this.state.gameState}/>
+        <button type="button" onClick={() => {
+          this.changeState(GameEvent.RESET, -1, -1, SquareState.BLANK);
+        }}>Reset</button>
       </div>
     );
   }

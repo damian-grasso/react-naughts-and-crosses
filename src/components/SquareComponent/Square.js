@@ -8,36 +8,28 @@ class Square extends React.Component {
   constructor() {
     super();
 
-    this.state = {
-      squareState: SquareState.BLANK
-    };
   }
 
   render() {
 
     return (
-      <td className="square" onClick={() => { 
-
-        console.log("Complete ", this.props.gameState);
+      <td className="square" onClick={() => {
 
         var newSquareState = null;
 
-        if (this.state.squareState == SquareState.BLANK) {
-
-          if (this.props.gameState == GameState.NAUGHTS_TURN) {
-            newSquareState = SquareState.NAUGHT;
-          }
-
-          else if (this.props.gameState == GameState.CROSSES_TURN) { 
-            newSquareState = SquareState.CROSS;
-          }
-
-          this.setState({ squareState: newSquareState }); 
-
-          this.props.changeState(GameEvent.TURN_COMPLETED, this.props.x, this.props.y, newSquareState);
+        if (this.props.squareState == SquareState.BLANK) {
+          if (this.props.gameState == GameState.NAUGHTS_TURN) { newSquareState = SquareState.NAUGHT; }
+          else if (this.props.gameState == GameState.CROSSES_TURN) { newSquareState = SquareState.CROSS; }
         }
+
+        console.log(this.props.x, this.props.y, newSquareState);
+        console.log(this.props.squareState);
+
+        this.props.changeState(GameEvent.TURN_COMPLETED, this.props.x, this.props.y, newSquareState);
+
+        console.log(this.props.squareState);
       }}>
-        <h3 className="square-value">{this.state.squareState}</h3>
+        <h3 className="square-value" key={this.props.squareState}>{this.props.squareState}</h3>
       </td>
     );
   }
