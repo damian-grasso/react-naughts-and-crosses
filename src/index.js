@@ -7,6 +7,11 @@ import SquareState from "./enums/SquareState";
 import GameState from "./enums/GameState";
 import "./index.css";
 
+import Button from 'react-bootstrap/Button';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+
 class App extends React.Component {
   constructor() {
     super();
@@ -30,7 +35,6 @@ class App extends React.Component {
     this.updateBoardState = this.updateBoardState.bind(this);
     this.resetBoardState = this.resetBoardState.bind(this);
     this.checkForWinner = this.checkForWinner.bind(this);
-    this.goBackOneTurn = this.goBackOneTurn.bind(this);
   }
 
   updateBoardState(boardState, xCoord, yCoord, newSquareState) {
@@ -197,15 +201,25 @@ class App extends React.Component {
 
   render() {
     return (
-      <div>
-        <h1 class="title">Naughts And Crosses</h1>
-        <GameBoard changeState={this.changeState} gameState={this.state.gameState} boardState={this.state.boardState}/>
+      <Container fluid>
+        <Row>
+          <Col>
+            <h2 class="title center">Naughts And Crosses</h2>
+            <GameBoard changeState={this.changeState} gameState={this.state.gameState} boardState={this.state.boardState}/>
+          </Col>
+        </Row>
         <ScorePanel changeState={this.changeState} gameState={this.state.gameState}/>
-        <button type="button" onClick={() => {
-          this.changeState(GameEvent.RESET, -1, -1, SquareState.BLANK);
-        }}>Reset</button>
-<br/>
-      </div>
+        <Row>
+          <Col>
+              <h4>{ this.state.gameState }</h4>
+              <Button variant="danger" size="md" type="button" onClick={() => {
+                this.changeState(GameEvent.RESET, -1, -1, SquareState.BLANK);
+                }}>
+                Reset
+              </Button>
+          </Col>
+        </Row>
+      </Container>
     );
   }
 }
