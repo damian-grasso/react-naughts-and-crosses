@@ -1,0 +1,17 @@
+.title {
+    font-family: Helvetica;
+    font-size: 48px;
+    color: black;
+}
+
+.gameText {
+    font-family: Helvetica;
+    color: black;
+    font-size: 24px;
+}
+
+.gameSubText {
+    font-family: Helvetica;
+    color: black;
+    font-size: 18px;
+}

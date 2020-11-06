@@ -6,7 +6,6 @@ import GameEvent from "./enums/GameEvent";
 import SquareState from "./enums/SquareState";
 import GameState from "./enums/GameState";
 import "./index.css";
-import PlayerState from "./enums/PlayerState";
 
 class App extends React.Component {
   constructor() {
@@ -24,7 +23,8 @@ class App extends React.Component {
           { x: 2, y: 0, value: SquareState.BLANK },
           { x: 2, y: 1, value: SquareState.BLANK },
           { x: 2, y: 2, value: SquareState.BLANK }
-      ]
+      ],
+      boardHistory: []
     };
 
     this.changeState = this.changeState.bind(this)
@@ -52,11 +52,17 @@ class App extends React.Component {
       return square;
     });
 
-    this.setState({ 
-      boardState: updatedBoardState 
+    this.setState(state => {
+      const boardHistory = state.boardHistory.concat([updatedBoardState]);
+ 
+      return {
+        boardState: updatedBoardState,
+        boardHistory: boardHistory
+      };
     });
 
     console.log("Updated board state ", updatedBoardState);
+    console.log("Board history", this.state.boardHistory);
 
     return updatedBoardState;
   }
@@ -68,10 +74,6 @@ class App extends React.Component {
     var updatedBoardState = _.map(boardState, function(square) {
       square.value = SquareState.BLANK;
       return square;
-    });
-    
-    this.setState({
-      boardState: updatedBoardState
     });
 
     return updatedBoardState;
@@ -204,8 +206,9 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <GameBoard outcome={this.state.outcome} changeState={this.changeState} gameState={this.state.gameState} boardState={this.state.boardState}/>
-        <ScorePanel outcome={this.state.outcome} changeState={this.changeState} gameState={this.state.gameState}/>
+        <h1 class="title">Naughts And Crosses</h1>
+        <GameBoard changeState={this.changeState} gameState={this.state.gameState} boardState={this.state.boardState}/>
+        <ScorePanel changeState={this.changeState} gameState={this.state.gameState}/>
         <button type="button" onClick={() => {
           this.changeState(GameEvent.RESET, -1, -1, SquareState.BLANK);
         }}>Reset</button>
