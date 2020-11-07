@@ -14,8 +14,8 @@ class ScorePanel extends React.Component {
 
   render() {
     return (
-      <Row>
-        <Col>
+      <Row className="container w-50 offset-3">
+        <Col className="">
           <Score player={ PlayerState.NAUGHTS_PLAYER } />
         </Col>
         <Col>

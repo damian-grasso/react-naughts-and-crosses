@@ -1,2 +1,2 @@
-const SquareState = { NAUGHT: "O", CROSS: "X", BLANK: "" }
+const SquareState = { BLANK: "", NAUGHT: "O", CROSS: "X" }
 export default SquareState;

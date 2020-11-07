@@ -4,6 +4,7 @@ import GameBoard from "./components/GameBoardComponent/GameBoard";
 import ScorePanel from "./components/ScorePanelComponent/ScorePanel";
 import GameEvent from "./enums/GameEvent";
 import SquareState from "./enums/SquareState";
+import TurnResult from "./enums/TurnResult";
 import GameState from "./enums/GameState";
 import "./index.css";
 
@@ -77,32 +78,36 @@ class App extends React.Component {
 
   updateGameState(gameState, boardState, event) {
 
-    var newGameState = null;   
+    var newGameState = 0;   
     
     switch (event) {
       case GameEvent.TURN_COMPLETED: 
-        var winner = this.checkForWinner(boardState);
+        var result = this.checkForWinner(boardState);
 
-        if (gameState == GameState.NAUGHTS_TURN) {
-          if (!winner) { 
-            newGameState = GameState.CROSSES_TURN; 
-          }
-    
-          else { 
-            newGameState = GameState.NAUGHTS_WINS; 
-          }
+        if (result == TurnResult.DRAW) {
+          newGameState = GameState.DRAW;
         }
-    
-        else if (gameState == GameState.CROSSES_TURN) {
-          if (!winner) { 
-            newGameState = GameState.NAUGHTS_TURN; 
+
+        else if (result == TurnResult.WIN) {
+          if (gameState == GameState.NAUGHTS_TURN) {
+            newGameState = GameState.NAUGHTS_WINS;
           }
-    
-          else { 
-            newGameState = GameState.CROSSES_WINS; 
+
+          else if (gameState == GameState.CROSSES_TURN) {
+            newGameState = GameState.CROSSES_WINS;
           }
         }
 
+        else if (result == TurnResult.PLAY_ON) {
+          if (gameState == GameState.NAUGHTS_TURN) {
+            newGameState = GameState.NAUGHTS_WINS;
+          }
+
+          else if (gameState == GameState.CROSSES_TURN) {
+            newGameState = GameState.CROSSES_WINS;
+          }
+        }
+        
         break;
       
       case GameEvent.RESET:
@@ -139,31 +144,38 @@ class App extends React.Component {
 
     console.log("Ways to win ", waysToWin);
 
-    var winner = _.find(waysToWin, function(wayToWin) {
-      
-      console.log(wayToWin[0].value == SquareState.NAUGHT && wayToWin[1].value == SquareState.NAUGHT && 
-        wayToWin[2].value == SquareState.NAUGHT);
+    var winnerFound = _.find(waysToWin, function(wayToWin) {
 
-      if (wayToWin[0].value == SquareState.NAUGHT && wayToWin[1].value == SquareState.NAUGHT && 
+      if (wayToWin[0].value == SquareState.NAUGHT && 
+          wayToWin[1].value == SquareState.NAUGHT && 
           wayToWin[2].value == SquareState.NAUGHT) {
 
-          return true;
+          return false;
       }
 
-      if (wayToWin[0].value == SquareState.CROSS && wayToWin[1].value == SquareState.CROSS && 
+      if (wayToWin[0].value == SquareState.CROSS && 
+          wayToWin[1].value == SquareState.CROSS && 
           wayToWin[2].value == SquareState.CROSS) {
 
-            return true;
-          }
+          return false;
+      }
     });
 
-    console.log(winner);
+    console.log("Winner Found: ", winnerFound);
 
-    if (winner == undefined) {
-      winner = false;
-    }
+    if (winnerFound) return TurnResult.WIN;
 
-    return winner;
+    var drawFound = boardState.every(function(currentValue) {
+        return currentValue.value != SquareState.BLANK;
+    });
+
+    console.log("Draw Found: ", drawFound)
+
+    if (drawFound) return TurnResult.DRAW;
+
+    console.log("Play On");
+
+    return TurnResult.PLAY_ON;
   }
 
   changeState(event, xCoord, yCoord, newSquareState) {
@@ -201,18 +213,18 @@ class App extends React.Component {
 
   render() {
     return (
-      <Container fluid>
+      <Container className="container" fluid>
         <Row>
           <Col>
-            <h2 class="title center">Naughts And Crosses</h2>
+            <h2 className="title center">Naughts And Crosses</h2>
             <GameBoard changeState={this.changeState} gameState={this.state.gameState} boardState={this.state.boardState}/>
           </Col>
         </Row>
         <ScorePanel changeState={this.changeState} gameState={this.state.gameState}/>
         <Row>
           <Col>
-              <h4>{ this.state.gameState }</h4>
-              <Button variant="danger" size="md" type="button" onClick={() => {
+              <h4 className="turnAnnouncer">{ this.state.gameState }</h4>
+              <Button className="resetButton" variant="danger" size="md" type="button" onClick={() => {
                 this.changeState(GameEvent.RESET, -1, -1, SquareState.BLANK);
                 }}>
                 Reset

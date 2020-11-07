@@ -2,16 +2,32 @@
     font-family: Helvetica;
     font-size: 48px;
     color: black;
+    padding: 10px;
 }
 
 .gameText {
     font-family: Helvetica;
     color: black;
     font-size: 24px;
+    padding: 10px;
 }
 
 .gameSubText {
     font-family: Helvetica;
     color: black;
     font-size: 18px;
+}
+
+.container {
+    align-content: center;
+    text-align: center;
+}
+
+.turnAnnouncer {
+    margin: 0px 0px 0px;
+    padding: 10px 10px 20px;
+}
+
+.tableRow {
+    height: 100px;
 }
