@@ -84,34 +84,37 @@ class App extends React.Component {
       case GameEvent.TURN_COMPLETED: 
         var result = this.checkForWinner(boardState);
 
-        if (result == TurnResult.DRAW) {
-          newGameState = GameState.DRAW;
+        console.log("Result: ", result);
+
+        if (result == TurnResult.PLAY_ON) {
+            if (gameState == GameState.NAUGHTS_TURN) {
+              newGameState = GameState.CROSSES_TURN;
+            }
+
+            else if (gameState == GameState.CROSSES_TURN) {
+              newGameState = GameState.NAUGHTS_TURN;
+            }
         }
 
-        else if (result == TurnResult.WIN) {
+        else if (result == TurnResult.DRAW) {
+            newGameState = GameState.DRAW;
+        }
+
+        else if (TurnResult.WIN) {
           if (gameState == GameState.NAUGHTS_TURN) {
             newGameState = GameState.NAUGHTS_WINS;
           }
-
+  
           else if (gameState == GameState.CROSSES_TURN) {
             newGameState = GameState.CROSSES_WINS;
           }
         }
 
-        else if (result == TurnResult.PLAY_ON) {
-          if (gameState == GameState.NAUGHTS_TURN) {
-            newGameState = GameState.NAUGHTS_WINS;
-          }
-
-          else if (gameState == GameState.CROSSES_TURN) {
-            newGameState = GameState.CROSSES_WINS;
-          }
-        }
-        
         break;
       
       case GameEvent.RESET:
         newGameState = GameState.NAUGHTS_TURN;
+        break;
     }
 
     this.setState({ gameState: newGameState });
@@ -127,43 +130,43 @@ class App extends React.Component {
 
     var waysToWin = [
 
-      // vertical wins
+      // vertical ways to win
       [boardState[0], boardState[1], boardState[2]],
       [boardState[3], boardState[4], boardState[5]],
       [boardState[6], boardState[7], boardState[8]],
 
-      // horiztonal wins
+      // horizotnal ways to win
       [boardState[0], boardState[3], boardState[6]],
       [boardState[1], boardState[4], boardState[7]],
       [boardState[2], boardState[5], boardState[8]],
 
-      // diagona wins
+      // diagonal ways to win
       [boardState[2], boardState[4], boardState[6]],
       [boardState[0], boardState[4], boardState[8]]
     ];
 
     console.log("Ways to win ", waysToWin);
 
-    var winnerFound = _.find(waysToWin, function(wayToWin) {
+    var winnerFound = _.some(waysToWin, function(wayToWin) {
 
       if (wayToWin[0].value == SquareState.NAUGHT && 
           wayToWin[1].value == SquareState.NAUGHT && 
           wayToWin[2].value == SquareState.NAUGHT) {
 
-          return false;
+          return true;
       }
 
       if (wayToWin[0].value == SquareState.CROSS && 
           wayToWin[1].value == SquareState.CROSS && 
           wayToWin[2].value == SquareState.CROSS) {
 
-          return false;
+          return true;
       }
     });
 
     console.log("Winner Found: ", winnerFound);
 
-    if (winnerFound) return TurnResult.WIN;
+    if (winnerFound == true) return TurnResult.WIN;
 
     var drawFound = boardState.every(function(currentValue) {
         return currentValue.value != SquareState.BLANK;
